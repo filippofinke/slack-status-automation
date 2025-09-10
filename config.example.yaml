@@ -1,0 +1,12 @@
+slack_token: "your-slack-token-here"
+
+intervals:
+  - time: "12:00"
+    presence: "away"
+    status_text: "Out for the day"
+    status_emoji: ":x:"
+
+  - time: "07:30"
+    presence: "auto"
+    status_text: "Working"
+    status_emoji: ":white_check_mark:"

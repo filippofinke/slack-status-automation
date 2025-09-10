@@ -1,4 +1,9 @@
-<h1 align="center">Slack Status Automation</h1>
+<div align="center">
+  <a href="https://github.com/filippofinke/BashNVR">
+    <img width="200px" src="https://github.com/user-attachments/assets/2b68e61e-419e-4433-a825-f4b9305f381e">
+  </a>
+  <h3 align="center">Slack Status Automation</h3>
+</div>
 
 > Lightweight Python service to automatically update Slack status based on a schedule and configurable rules.
 

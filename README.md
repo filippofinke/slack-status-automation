@@ -14,7 +14,7 @@ This project lets you define status messages, emojis, and schedule rules so a sm
 - [x] Scheduled status updates using a configurable scheduler
 - [x] **Day-of-week scheduling** - Different statuses for weekdays, weekends, or specific days
 - [x] **Time range constraints** - Statuses that only apply during certain hours
-- [x] Read configuration from `config.yaml` (example provided)
+- [x] Read configuration from `config.yml` (example provided)
 - [x] Slack integration using a token-based API client
 - [x] Dockerfile and `docker-compose.yml` for containerized deployment
 - [x] Small, easy-to-read codebase (single module + package)
@@ -40,10 +40,10 @@ Create configuration
 1. Copy the example config:
 
 ```bash
-cp config.example.yaml config.yaml
+cp config.example.yml config.yml
 ```
 
-2. Edit `config.yaml` and set your Slack token and schedules. At minimum set `slack.token` and one `schedules` entry.
+2. Edit `config.yml` and set your Slack token and schedules. At minimum set `slack.token` and one `schedules` entry.
 
 Run locally
 
@@ -52,17 +52,17 @@ Run locally
 python slack_status.py
 ```
 
-The service will read `config.yaml` from the repository root by default.
+The service will read `config.yml` from the repository root by default.
 
 ## Configuration
 
-Open `config.example.yaml` (renamed to `config.yaml`) to see available settings.
+Open `config.example.yml` (renamed to `config.yml`) to see available settings.
 
 ### Basic Configuration
 
 Simple time-based status updates with day constraints:
 
-```yaml
+```yml
 slack_token: "your-slack-token-here"
 
 intervals:
@@ -71,7 +71,7 @@ intervals:
     presence: "auto"
     status_text: "Working"
     status_emoji: ":white_check_mark:"
-    
+
   - time: "12:00"
     days: "weekdays"
     presence: "away"
@@ -83,7 +83,7 @@ intervals:
 
 Schedule statuses for specific days or time ranges:
 
-```yaml
+```yml
 slack_token: "your-slack-token-here"
 
 intervals:
@@ -126,7 +126,7 @@ Each interval supports the following fields:
 - **`time`** (required): Time in HH:MM format when the status should be set
 - **`days`** (required): Day constraints - can be:
   - `"weekdays"` - Monday through Friday
-  - `"weekends"` - Saturday and Sunday  
+  - `"weekends"` - Saturday and Sunday
   - `["monday", "tuesday", ...]` - Specific days of the week
 - **`time_range`** (optional): Time range when the status is active
   - `start`: Start time in HH:MM format
@@ -150,13 +150,13 @@ docker compose up -d
 
 Environment variables
 
-Set the token via environment variables or a mounted `config.yaml`. Example `docker-compose.yml` in this repo demonstrates usage.
+Set the token via environment variables or a mounted `config.yml`. Example `docker-compose.yml` in this repo demonstrates usage.
 
 ## Troubleshooting
 
 - Logs: If running with Docker Compose, use `docker compose logs -f`.
 - Token errors: ensure the token has `users.profile:write` scope.
-- Config load errors: ensure YAML indentation is correct and required fields exist.
+- Config load errors: ensure yml indentation is correct and required fields exist.
 
 ## Author
 

@@ -5,5 +5,5 @@ services:
       - TZ=Europe/Zurich
     volumes:
       - ./:/app:ro
-      - ./config.yaml:/app/config.yaml:ro
+      - ./config.yml:/app/config.yml:ro
     restart: unless-stopped

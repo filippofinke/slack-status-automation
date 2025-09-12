@@ -6,7 +6,7 @@ class ConfigError(Exception):
     """Custom exception for configuration errors."""
     pass
 
-def load_config(path: str = "config.yaml") -> Dict[str, Any]:
+def load_config(path: str = "config.yml") -> Dict[str, Any]:
     """
     Load YAML configuration from `path`.
     If the file does not exist, a `ConfigError` is raised.
@@ -30,11 +30,11 @@ def validate_config(config: Dict[str, Any]) -> None:
     errors: List[str] = []
 
     if not get_slack_token(config):
-        errors.append("Missing Slack token: set SLACK_TOKEN or add 'slack_token' to config.yaml")
+        errors.append("Missing Slack token: set SLACK_TOKEN or add 'slack_token' to config.yml")
 
     intervals = config.get("intervals")
     if intervals is None:
-        errors.append("Missing 'intervals' section in config.yaml")
+        errors.append("Missing 'intervals' section in config.yml")
     elif not isinstance(intervals, list) or not intervals:
         errors.append("'intervals' must be a non-empty list")
     else:

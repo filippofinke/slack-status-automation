@@ -4,3 +4,5 @@ __pycache__/
 config.yaml
 test_*.yaml
 test_*.py
+.venv
+.vscode

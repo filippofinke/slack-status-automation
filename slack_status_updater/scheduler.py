@@ -18,11 +18,10 @@ class Scheduler:
 
     def _is_interval_active(self, interval: Dict[str, Any], current_time: datetime) -> bool:
         """Check if an interval should be active at the current time."""
-        # Check day constraints
-        if "days" in interval:
-            allowed_days = parse_days(interval["days"])
-            if not is_day_match(current_time.weekday(), allowed_days):
-                return False
+        # Check day constraints (now required)
+        allowed_days = parse_days(interval["days"])
+        if not is_day_match(current_time.weekday(), allowed_days):
+            return False
         
         # Check time range constraints
         if "time_range" in interval:
@@ -78,28 +77,17 @@ class Scheduler:
             else:
                 logger.debug(f"Skipping job at {job_time} - not active for current day/time constraints")
         
-        if "days" in interval:
-            # Schedule for specific days
-            allowed_days = parse_days(interval["days"])
-            day_map = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
-            
-            for day_num in allowed_days:
-                day_name = day_map[day_num]
-                getattr(schedule.every(), day_name).at(job_time).do(status_update_job)
-                logger.info(
-                    "Scheduled %s on %s at %s with '%s' %s",
-                    interval.get("presence", "auto"),
-                    day_name,
-                    job_time,
-                    interval.get("status_text", ""),
-                    interval.get("status_emoji", ""),
-                )
-        else:
-            # Schedule for every day (backwards compatibility)
-            schedule.every().day.at(job_time).do(status_update_job)
+        # Schedule for specific days
+        allowed_days = parse_days(interval["days"])
+        day_map = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        
+        for day_num in allowed_days:
+            day_name = day_map[day_num]
+            getattr(schedule.every(), day_name).at(job_time).do(status_update_job)
             logger.info(
-                "Scheduled %s at %s with '%s' %s",
+                "Scheduled %s on %s at %s with '%s' %s",
                 interval.get("presence", "auto"),
+                day_name,
                 job_time,
                 interval.get("status_text", ""),
                 interval.get("status_emoji", ""),

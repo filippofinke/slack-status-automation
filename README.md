@@ -14,7 +14,6 @@ This project lets you define status messages, emojis, and schedule rules so a sm
 - [x] Scheduled status updates using a configurable scheduler
 - [x] **Day-of-week scheduling** - Different statuses for weekdays, weekends, or specific days
 - [x] **Time range constraints** - Statuses that only apply during certain hours
-- [x] **Backwards compatibility** - Existing configurations continue to work
 - [x] Read configuration from `config.yaml` (example provided)
 - [x] Slack integration using a token-based API client
 - [x] Dockerfile and `docker-compose.yml` for containerized deployment
@@ -61,18 +60,20 @@ Open `config.example.yaml` (renamed to `config.yaml`) to see available settings.
 
 ### Basic Configuration
 
-Simple time-based status updates (backwards compatible):
+Simple time-based status updates with day constraints:
 
 ```yaml
 slack_token: "your-slack-token-here"
 
 intervals:
   - time: "07:30"
+    days: "weekdays"
     presence: "auto"
     status_text: "Working"
     status_emoji: ":white_check_mark:"
     
   - time: "12:00"
+    days: "weekdays"
     presence: "away"
     status_text: "Out for the day"
     status_emoji: ":x:"
@@ -123,7 +124,7 @@ intervals:
 Each interval supports the following fields:
 
 - **`time`** (required): Time in HH:MM format when the status should be set
-- **`days`** (optional): Day constraints - can be:
+- **`days`** (required): Day constraints - can be:
   - `"weekdays"` - Monday through Friday
   - `"weekends"` - Saturday and Sunday  
   - `["monday", "tuesday", ...]` - Specific days of the week
@@ -134,7 +135,7 @@ Each interval supports the following fields:
 - **`status_text`**: Custom status message
 - **`status_emoji`**: Status emoji (e.g., `:computer:`)
 
-**Note:** Time ranges can cross midnight (e.g., start: "22:00", end: "06:00"). If no day constraints are specified, the interval applies to all days (backwards compatible).
+**Note:** Time ranges can cross midnight (e.g., start: "22:00", end: "06:00").
 
 Security note: Do not commit real tokens into git. Prefer environment variables or secrets.
 

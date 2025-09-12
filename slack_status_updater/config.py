@@ -53,8 +53,10 @@ def validate_config(config: Dict[str, Any]) -> None:
                 except ValueError:
                     errors.append(f"intervals[{i}].time has invalid format, expected HH:MM")
             
-            # Validate days field (optional)
-            if "days" in item:
+            # Validate days field (required)
+            if "days" not in item:
+                errors.append(f"intervals[{i}] missing required 'days' field")
+            else:
                 try:
                     from .utils import parse_days
                     parse_days(item["days"])

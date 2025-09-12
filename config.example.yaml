@@ -1,8 +1,9 @@
 slack_token: "your-slack-token-here"
 
 intervals:
-  # Basic time-based status (backwards compatible)
+  # Early morning status
   - time: "07:30"
+    days: "weekdays"
     presence: "auto"
     status_text: "Starting my day"
     status_emoji: ":sunrise:"

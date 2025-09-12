@@ -4,6 +4,9 @@ from .utils import parse_time, parse_days, is_time_in_range
 
 DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
+# Default calendar resolution in minutes (can be overridden by CLI)
+DEFAULT_INTERVAL = 30
+
 def _get_job_for_weekday_hour_min(intervals: List[Dict], weekday: int, hour: int, minute: int) -> Optional[Dict]:
     """
     Determine which interval (if any) would apply on a given weekday and time (hour, minute).
@@ -79,11 +82,18 @@ def _cell_label(job: Optional[Dict], maxlen: int = 12) -> str:
         return label[: maxlen - 1] + "…"
     return label or "-"
 
-def render_week_calendar(intervals: List[Dict]) -> str:
+def render_week_calendar(intervals: List[Dict], interval_minutes: Optional[int] = None) -> str:
     """
-    Render a compact week calendar in 30-minute increments: rows are 00:00, 00:30, ..., 23:30;
+    Render a compact week calendar in interval_minutes increments: rows are 00:00, 00:XX, ...;
     columns are Mon..Sun. Each cell shows a short label (emoji / status_text / presence).
     """
+    if interval_minutes is None:
+        interval_minutes = DEFAULT_INTERVAL
+
+    # ensure interval nicely divides the day
+    if 24 * 60 % interval_minutes != 0:
+        raise ValueError("interval_minutes must divide 1440 (minutes per day) evenly")
+
     col_width = 14
     time_col_width = 6
     header = " " * time_col_width
@@ -91,10 +101,12 @@ def render_week_calendar(intervals: List[Dict]) -> str:
         header += d.center(col_width)
     lines = [header, "-" * (time_col_width + col_width * 7)]
 
-    # 48 rows per day (every 30 minutes)
-    for slot in range(48):
-        hour = slot // 2
-        minute = 30 if slot % 2 else 0
+    # rows per day based on chosen interval
+    rows_per_day = 24 * 60 // interval_minutes
+    for slot in range(rows_per_day):
+        total_minutes = slot * interval_minutes
+        hour = total_minutes // 60
+        minute = total_minutes % 60
         time_label = f"{hour:02d}:{minute:02d}".rjust(time_col_width)
         row = time_label
         for wd in range(7):
@@ -104,5 +116,5 @@ def render_week_calendar(intervals: List[Dict]) -> str:
         lines.append(row)
 
     lines.append("")  # blank line
-    lines.append("Legend: cells show (emoji) or status_text or presence. Calendar uses 30-minute resolution.")
+    lines.append(f"Legend: cells show (emoji) or status_text or presence. Calendar uses {interval_minutes}-minute resolution.")
     return "\n".join(lines)

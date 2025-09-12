@@ -77,6 +77,21 @@ class Scheduler:
             else:
                 logger.debug(f"Skipping job at {job_time} - not active for current day/time constraints")
         
+        def time_range_end_job():
+            """Job that runs when a time range expires to switch to next appropriate status."""
+            current_job = self.get_current_job()
+            if current_job:
+                self.updater.set_status(
+                    presence=current_job.get("presence", "auto"),
+                    text=current_job.get("status_text", ""),
+                    emoji=current_job.get("status_emoji", ""),
+                )
+                logger.info(f"Time range expired - switched to status: '{current_job.get('status_text', '')}'")
+            else:
+                # No active status found - clear the status
+                self.updater.set_status(presence="auto", text="", emoji="")
+                logger.info("Time range expired - cleared status (no active intervals)")
+        
         # Schedule for specific days
         allowed_days = parse_days(interval["days"])
         day_map = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
@@ -92,6 +107,16 @@ class Scheduler:
                 interval.get("status_text", ""),
                 interval.get("status_emoji", ""),
             )
+            
+            # If this interval has a time_range, also schedule a job when it expires
+            if "time_range" in interval:
+                end_time = interval["time_range"]["end"]
+                getattr(schedule.every(), day_name).at(end_time).do(time_range_end_job)
+                logger.info(
+                    "Scheduled time range end job on %s at %s",
+                    day_name,
+                    end_time,
+                )
 
     def schedule_jobs(self) -> None:
         """Schedule all status updates."""

@@ -4,15 +4,15 @@ from .utils import parse_time, parse_days, is_time_in_range
 
 DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-def _get_job_for_weekday_hour(intervals: List[Dict], weekday: int, hour: int) -> Optional[Dict]:
+def _get_job_for_weekday_hour_min(intervals: List[Dict], weekday: int, hour: int, minute: int) -> Optional[Dict]:
     """
-    Determine which interval (if any) would apply on a given weekday and hour.
+    Determine which interval (if any) would apply on a given weekday and time (hour, minute).
     Behaviour: treat each configured interval as a 'start' event on its allowed days,
     then pick the most recent start (searching backwards through the week) so that
     a status carries forward until replaced. If a job has a time_range, that range
     must include the target time to apply; otherwise it is skipped.
     """
-    target_time = dt_time(hour, 0)
+    target_time = dt_time(hour, minute)
 
     # Build flattened list of starts: (minute_of_week, job)
     starts: List[tuple[int, Dict]] = []
@@ -33,7 +33,7 @@ def _get_job_for_weekday_hour(intervals: List[Dict], weekday: int, hour: int) ->
         return None
 
     starts.sort(key=lambda x: x[0])
-    target_min = weekday * 1440 + hour * 60
+    target_min = weekday * 1440 + hour * 60 + minute
 
     # find index of last start <= target_min, or wrap to last start
     idx = None
@@ -81,25 +81,28 @@ def _cell_label(job: Optional[Dict], maxlen: int = 12) -> str:
 
 def render_week_calendar(intervals: List[Dict]) -> str:
     """
-    Render a compact week calendar: rows are hours 00-23, columns are Mon..Sun.
-    Each cell shows a short label (emoji / status_text / presence).
+    Render a compact week calendar in 30-minute increments: rows are 00:00, 00:30, ..., 23:30;
+    columns are Mon..Sun. Each cell shows a short label (emoji / status_text / presence).
     """
     col_width = 14
-    hour_col_width = 6
-    header = " " * hour_col_width
+    time_col_width = 6
+    header = " " * time_col_width
     for d in DAY_NAMES:
         header += d.center(col_width)
-    lines = [header, "-" * (hour_col_width + col_width * 7)]
+    lines = [header, "-" * (time_col_width + col_width * 7)]
 
-    for hour in range(24):
-        hour_label = f"{hour:02d}:00".rjust(hour_col_width)
-        row = hour_label
+    # 48 rows per day (every 30 minutes)
+    for slot in range(48):
+        hour = slot // 2
+        minute = 30 if slot % 2 else 0
+        time_label = f"{hour:02d}:{minute:02d}".rjust(time_col_width)
+        row = time_label
         for wd in range(7):
-            job = _get_job_for_weekday_hour(intervals, wd, hour)
+            job = _get_job_for_weekday_hour_min(intervals, wd, hour, minute)
             cell = _cell_label(job, maxlen=col_width - 2)
             row += cell.center(col_width)
         lines.append(row)
 
     lines.append("")  # blank line
-    lines.append("Legend: cell shows (emoji) or status_text or presence. '-' = no interval")
+    lines.append("Legend: cells show (emoji) or status_text or presence. Calendar uses 30-minute resolution.")
     return "\n".join(lines)

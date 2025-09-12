@@ -42,6 +42,8 @@ def validate_config(config: Dict[str, Any]) -> None:
             if not isinstance(item, dict):
                 errors.append(f"intervals[{i}] must be a mapping")
                 continue
+            
+            # Validate time field
             if "time" not in item:
                 errors.append(f"intervals[{i}] missing required 'time' (HH:MM)")
             else:
@@ -50,6 +52,38 @@ def validate_config(config: Dict[str, Any]) -> None:
                     parse_time(item["time"])
                 except ValueError:
                     errors.append(f"intervals[{i}].time has invalid format, expected HH:MM")
+            
+            # Validate days field (optional)
+            if "days" in item:
+                try:
+                    from .utils import parse_days
+                    parse_days(item["days"])
+                except ValueError as e:
+                    errors.append(f"intervals[{i}].days: {e}")
+            
+            # Validate time_range field (optional)
+            if "time_range" in item:
+                time_range = item["time_range"]
+                if not isinstance(time_range, dict):
+                    errors.append(f"intervals[{i}].time_range must be a mapping with 'start' and 'end'")
+                else:
+                    if "start" not in time_range:
+                        errors.append(f"intervals[{i}].time_range missing required 'start' (HH:MM)")
+                    else:
+                        try:
+                            from .utils import parse_time
+                            parse_time(time_range["start"])
+                        except ValueError:
+                            errors.append(f"intervals[{i}].time_range.start has invalid format, expected HH:MM")
+                    
+                    if "end" not in time_range:
+                        errors.append(f"intervals[{i}].time_range missing required 'end' (HH:MM)")
+                    else:
+                        try:
+                            from .utils import parse_time
+                            parse_time(time_range["end"])
+                        except ValueError:
+                            errors.append(f"intervals[{i}].time_range.end has invalid format, expected HH:MM")
 
     if errors:
         raise ConfigError("\\n".join(errors))

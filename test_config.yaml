@@ -1,0 +1,25 @@
+slack_token: "test-token"
+
+intervals:
+  # Basic backwards compatible format
+  - time: "07:30"
+    presence: "auto"
+    status_text: "Starting my day"
+    status_emoji: ":sunrise:"
+
+  # Weekday working hours
+  - time: "09:00"
+    days: "weekdays"
+    presence: "auto"
+    status_text: "Working"
+    status_emoji: ":computer:"
+
+  # Specific days with time range
+  - time: "14:00"
+    days: ["monday", "wednesday"]
+    time_range:
+      start: "14:00"
+      end: "16:00"
+    presence: "away"
+    status_text: "Meeting time"
+    status_emoji: ":calendar:"

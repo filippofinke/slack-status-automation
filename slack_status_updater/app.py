@@ -46,11 +46,15 @@ class SlackStatusUpdater:
         try:
             # Set initial status
             current_job = self.scheduler.get_current_job()
-            self.updater.set_status(
-                presence=current_job.get("presence", "auto"),
-                text=current_job.get("status_text", ""),
-                emoji=current_job.get("status_emoji", ""),
-            )
+            if current_job:
+                self.updater.set_status(
+                    presence=current_job.get("presence", "auto"),
+                    text=current_job.get("status_text", ""),
+                    emoji=current_job.get("status_emoji", ""),
+                )
+                logger.info("Initial status set based on current schedule")
+            else:
+                logger.info("No active schedule for current time/day - status not updated")
 
             # Schedule future updates
             self.scheduler.schedule_jobs()

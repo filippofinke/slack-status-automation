@@ -2,6 +2,7 @@ import logging
 from .config import load_config, validate_config, get_slack_token, ConfigError
 from .slack import SlackUpdater
 from .scheduler import Scheduler
+from .calendar import render_week_calendar
 
 logger = logging.getLogger(__name__)
 
@@ -44,13 +45,24 @@ class SlackStatusUpdater:
             return
 
         try:
+            # Display weekly calendar of statuses at startup
+            try:
+                print("\nWeekly schedule (hours 00-23, Mon → Sun):\n")
+                print(render_week_calendar(self.scheduler.intervals))
+            except Exception as e:
+                logger.warning("Failed to render week calendar: %s", e)
+
             # Set initial status
             current_job = self.scheduler.get_current_job()
-            self.updater.set_status(
-                presence=current_job.get("presence", "auto"),
-                text=current_job.get("status_text", ""),
-                emoji=current_job.get("status_emoji", ""),
-            )
+            if current_job:
+                self.updater.set_status(
+                    presence=current_job.get("presence", "auto"),
+                    text=current_job.get("status_text", ""),
+                    emoji=current_job.get("status_emoji", ""),
+                )
+                logger.info("Initial status set based on current schedule")
+            else:
+                logger.info("No active schedule for current time/day - status not updated")
 
             # Schedule future updates
             self.scheduler.schedule_jobs()

@@ -12,6 +12,8 @@ This project lets you define status messages, emojis, and schedule rules so a sm
 ## Features
 
 - [x] Scheduled status updates using a configurable scheduler
+- [x] **Day-of-week scheduling** - Different statuses for weekdays, weekends, or specific days
+- [x] **Time range constraints** - Statuses that only apply during certain hours
 - [x] Read configuration from `config.yaml` (example provided)
 - [x] Slack integration using a token-based API client
 - [x] Dockerfile and `docker-compose.yml` for containerized deployment
@@ -54,24 +56,86 @@ The service will read `config.yaml` from the repository root by default.
 
 ## Configuration
 
-Open `config.example.yaml` (renamed to `config.yaml`) to see available settings. Typical fields:
+Open `config.example.yaml` (renamed to `config.yaml`) to see available settings.
 
-Example snippet
+### Basic Configuration
+
+Simple time-based status updates with day constraints:
 
 ```yaml
 slack_token: "your-slack-token-here"
 
 intervals:
-  - time: "12:00"
-    presence: "away"
-    status_text: "Out for the day"
-    status_emoji: ":x:"
-
   - time: "07:30"
+    days: "weekdays"
     presence: "auto"
     status_text: "Working"
     status_emoji: ":white_check_mark:"
+    
+  - time: "12:00"
+    days: "weekdays"
+    presence: "away"
+    status_text: "Out for the day"
+    status_emoji: ":x:"
 ```
+
+### Advanced Configuration
+
+Schedule statuses for specific days or time ranges:
+
+```yaml
+slack_token: "your-slack-token-here"
+
+intervals:
+  # Weekday working hours
+  - time: "09:00"
+    days: "weekdays"
+    presence: "auto"
+    status_text: "Working"
+    status_emoji: ":computer:"
+
+  # Weekend status
+  - time: "09:00"
+    days: "weekends"
+    presence: "away"
+    status_text: "Out of Office"
+    status_emoji: ":palm_tree:"
+
+  # Specific days
+  - time: "18:00"
+    days: ["monday", "wednesday", "friday"]
+    presence: "away"
+    status_text: "Gym time"
+    status_emoji: ":muscle:"
+
+  # Time range constraints (only active during specific hours)
+  - time: "10:00"
+    days: ["friday"]
+    time_range:
+      start: "10:00"
+      end: "16:00"
+    presence: "auto"
+    status_text: "Friday focus time"
+    status_emoji: ":dart:"
+```
+
+### Configuration Options
+
+Each interval supports the following fields:
+
+- **`time`** (required): Time in HH:MM format when the status should be set
+- **`days`** (required): Day constraints - can be:
+  - `"weekdays"` - Monday through Friday
+  - `"weekends"` - Saturday and Sunday  
+  - `["monday", "tuesday", ...]` - Specific days of the week
+- **`time_range`** (optional): Time range when the status is active
+  - `start`: Start time in HH:MM format
+  - `end`: End time in HH:MM format
+- **`presence`**: Slack presence (`"auto"` or `"away"`)
+- **`status_text`**: Custom status message
+- **`status_emoji`**: Status emoji (e.g., `:computer:`)
+
+**Note:** Time ranges can cross midnight (e.g., start: "22:00", end: "06:00").
 
 Security note: Do not commit real tokens into git. Prefer environment variables or secrets.
 

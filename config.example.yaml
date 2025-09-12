@@ -1,12 +1,61 @@
 slack_token: "your-slack-token-here"
 
 intervals:
-  - time: "12:00"
-    presence: "away"
-    status_text: "Out for the day"
-    status_emoji: ":x:"
-
+  # Early morning status
   - time: "07:30"
+    days: "weekdays"
+    presence: "auto"
+    status_text: "Starting my day"
+    status_emoji: ":sunrise:"
+
+  # Weekday working hours
+  - time: "09:00"
+    days: "weekdays"
     presence: "auto"
     status_text: "Working"
-    status_emoji: ":white_check_mark:"
+    status_emoji: ":computer:"
+
+  # Lunch break on weekdays only
+  - time: "12:00"
+    days: "weekdays"
+    presence: "away"
+    status_text: "Lunch break"
+    status_emoji: ":hamburger:"
+
+  # Back from lunch on weekdays
+  - time: "13:00"
+    days: "weekdays"
+    presence: "auto"
+    status_text: "Working"
+    status_emoji: ":computer:"
+
+  # End of workday on weekdays
+  - time: "17:00"
+    days: "weekdays"
+    presence: "away"
+    status_text: "Done for the day"
+    status_emoji: ":wave:"
+
+  # Weekend status
+  - time: "09:00"
+    days: "weekends"
+    presence: "away"
+    status_text: "Out of Office"
+    status_emoji: ":palm_tree:"
+
+  # Time range example (only active from 10 AM to 4 PM on Fridays)
+  - time: "10:00"
+    days: ["friday"]
+    time_range:
+      start: "10:00"
+      end: "16:00"
+    presence: "auto"
+    status_text: "Friday focus time"
+    status_emoji: ":dart:"
+
+  # Specific days example
+  - time: "18:00"
+    days: ["monday", "wednesday", "friday"]
+    presence: "away"
+    status_text: "Gym time"
+    status_emoji: ":muscle:"

@@ -9,6 +9,12 @@
 
 This project lets you define status messages, emojis, and schedule rules so a small scheduler updates your Slack presence automatically. It supports both a local Python setup and a Docker-based deployment.
 
+<details><summary>Demo</summary>
+  
+![render1757708936291](https://github.com/user-attachments/assets/3ed35948-b4ae-4b35-adb0-63833d70fb03)
+
+</details>
+
 ## Features
 
 - [x] Scheduled status updates using a configurable scheduler
